@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   PanResponder,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,8 +12,30 @@ import {
 import Svg, { Polyline } from "react-native-svg";
 
 export default function App() {
-  const [location, setLocation] = useState({ y: 0, x: 0 });
-
+  const checkFirstNode = (x, y) => {
+    if (locationList.length > 0) {
+      const { 0: loc } = locationList;
+      console.log(loc, x, y, "loc");
+      if (
+        locationList.length > 2 &&
+        loc.x === locationList[locationList.length - 1].x &&
+        loc.y === locationList[locationList.length - 1].y
+      ) {
+        return true;
+      }
+      if (
+        (x > loc.x && x < loc.x + 25 && y > loc.y && y < loc.y + 25) ||
+        (x < loc.x && x > loc.x - 25 && y < loc.y && y > loc.y - 25)
+      ) {
+        setLocationList([...locationList, loc]);
+        console.log(loc, "LOC1");
+      } else {
+        setLocationList(locationList.concat({ x, y }));
+      }
+    } else {
+      setLocationList(locationList.concat({ x, y }));
+    }
+  };
   const [locationList, setLocationList] = useState([]);
 
   const panresponder = PanResponder.create({
@@ -29,39 +52,30 @@ export default function App() {
     onPanResponderMove: (evt, gestureState) => false,
 
     onPanResponderRelease: (evt, gestureState) => {
-      setLocationList(
-        locationList.concat({
-          x: evt.nativeEvent.locationX.toFixed(2),
-          y: evt.nativeEvent.locationY.toFixed(2),
-        })
+      checkFirstNode(
+        evt.nativeEvent.pageX.toFixed(2) - 0,
+        evt.nativeEvent.pageY.toFixed(2) - 84
       );
+      // setLocationList(
+      //   locationList.concat({
+      //     x: evt.nativeEvent.pageX.toFixed(2) - 0,
+      //     y: evt.nativeEvent.pageY.toFixed(2) - 84,
+      //   })
+      // );
     },
   });
+
+  const h2 = Platform.OS === "ios" ? 90 : 75;
 
   const GesturePath = ({ path, color }) => {
     const { width, height } = Dimensions.get("window");
     const points = path?.map((p) => `${p.x},${p.y}`).join(" ");
     return (
       <Svg
-        height="100%"
-        width="100%"
         style={{ backgroundColor: "transparent" }}
-        viewBox={`0 0 ${width} ${height - 90}`}
+        viewBox={`0 0 ${width} ${height - h2}`}
       >
-        <Polyline
-          points={points}
-          strokeColors={[
-            "#7F0000",
-            "#00000000", // no color, creates a "long" gradient between the previous and next coordinate
-            "#B24112",
-            "#E5845C",
-            "#238C23",
-            "#7F0000",
-          ]}
-          fill="none"
-          stroke={color}
-          strokeWidth="3"
-        />
+        <Polyline points={points} fill="none" stroke={color} strokeWidth="3" />
       </Svg>
     );
   };
@@ -71,6 +85,7 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar translucent />
       <TouchableOpacity
+        style={{ padding: 5 }}
         onPress={() => {
           const array = locationList;
           array.pop();
@@ -99,7 +114,7 @@ export default function App() {
             style={[
               styles.dot,
               {
-                top: parseFloat(l.y - 15),
+                top: parseFloat(l.y - 0),
                 left: parseFloat(l.x - 15),
               },
             ]}

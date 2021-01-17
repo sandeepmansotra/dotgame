@@ -10,8 +10,18 @@ import {
   View,
 } from "react-native";
 import Svg, { Polyline } from "react-native-svg";
+import codePush from "react-native-code-push";
 
-export default function App() {
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_START };
+
+function App() {
+  useEffect(() => {
+    codePush.sync({
+      installMode: codePush.InstallMode.IMMEDIATE,
+      cb: (status) => console.log(status, "Status"),
+    });
+  }, []);
+
   const checkFirstNode = (x, y) => {
     if (locationList.length > 0) {
       const { 0: loc } = locationList;
@@ -65,7 +75,7 @@ export default function App() {
     },
   });
 
-  const h2 = Platform.OS === "ios" ? 90 : 75;
+  const h2 = Platform.OS === "ios" ? 90 : 70;
 
   const GesturePath = ({ path, color }) => {
     const { width, height } = Dimensions.get("window");
@@ -129,6 +139,8 @@ export default function App() {
   );
 }
 
+export default codePush(codePushOptions)(App);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -155,6 +167,6 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 15,
-    backgroundColor: "black",
+    backgroundColor: "red",
   },
 });

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+  <string name="app_name">Dot Game</string>
+  <string moduleConfig="true" name="CodePushDeploymentKey">FYjUTqzJE7ZQTiycGxwLbqCghuwr4JaS2dI3U</string>
+</resources>
